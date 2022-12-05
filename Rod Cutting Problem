@@ -1,0 +1,73 @@
+#include <iostream>
+#include <string>
+
+int max(int x, int y) {
+	if (x > y) {
+		return x;
+	}
+	else {
+		return y;
+	}
+}
+
+int main()
+{
+	int k, * Price, * row, * slice;
+	std::cin >> k;
+
+	Price = new int[k];
+	for (int i = 0; i < k; i++) {
+		std::cin >> Price[i];
+	}
+
+	slice = new int[k];
+	row = new int[k + 1];
+	row[0] = 0;
+
+	for (int i = 1; i < k + 1; i++) {
+		int q = -1, index = 1;
+		for (int j = 1; j < i + 1; j++) {
+			if (q < Price[j - 1] + row[i - j]) {
+				index = j;
+			}
+			q = max(q, Price[j - 1] + row[i - j]);
+		}
+		row[i] = q;
+		slice[i - 1] = index;
+	}
+
+
+	int count = 0;
+	int length = k;
+
+	while (true) {
+		if (slice[length - 1] == length) {
+			count++;
+			break;
+		}
+		length -= slice[length - 1];
+		count++;
+	}
+
+	std::cout << row[k] << std::endl;
+	std::cout << count << std::endl;
+	std::cout << k << "=";
+
+	length = k;
+
+	while (true) {
+		if (slice[length - 1] == length) {
+			std::cout << slice[length - 1];
+			break;
+		}
+		std::cout << slice[length - 1] << "+";
+		length -= slice[length - 1];
+		count++;
+	}
+
+	delete[] slice;
+	delete[] row;
+	delete[] Price;
+}
+
+
