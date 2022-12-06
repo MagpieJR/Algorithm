@@ -1,0 +1,119 @@
+#include <iostream>
+#include <string>
+
+int max(int x, int y) {
+	if (x > y) {
+		return x;
+	}
+	else {
+		return y;
+	}
+}
+
+int main()
+{
+	int N, W, V, * c1, * w1, * v1, *t, *s, ***M;
+	std::cin >> N >> W >> V;
+
+	c1 = new int[N];
+	w1 = new int[N];
+	v1 = new int[N];
+
+
+
+	for (int i = 0; i < N; i++) {
+		std::cin >> c1[i];
+	}
+
+	for (int i = 0; i < N; i++) {
+		std::cin >> w1[i];
+	}
+
+	for (int i = 0; i < N; i++) {
+		std::cin >> v1[i];
+	}
+
+
+	M = new int** [N + 1];
+	for (int i = 0; i < N + 1; i++) {
+		M[i] = new int* [W + 1];
+		for (int j = 0; j < W + 1; j++) {
+			M[i][j] = new int[V + 1];
+		}
+	}
+
+	for (int i = 0; i < W + 1; i++) {
+		for (int j = 0; j < V + 1; j++) {
+			M[0][i][j] = 0;
+		}
+	}
+
+
+
+	for (int i = 1; i < N + 1; i++) {
+		for (int w = 0; w < W + 1; w++) {
+			for (int v = 0; v < V + 1; v++) {
+				if (w1[i - 1] > w || v1[i - 1] > v) {
+					M[i][w][v] = M[i - 1][w][v];
+				}
+				else {
+					M[i][w][v] = max(c1[i - 1] + M[i - 1][w - w1[i - 1]][v - v1[i - 1]], M[i - 1][w][v]);
+				}
+			}
+		}
+	}
+
+/*
+	for (int k = 0; k < N + 1; k++) {
+		std::cout << "i = " << k << std::endl;
+		for (int i = 0; i < W + 1; i++) {
+			std::cout << "w = " << i << " ";
+			for (int j = 0; j < V + 1; j++) {
+				std::cout << M[k][i][j] << " ";
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+	}
+*/
+
+	int count = 0, *result;
+	int temp_w = W, temp_v = V;
+	result = new int[N];
+	for(int i = N; i > 0; i--) {
+		if (M[i][temp_w][temp_v] > M[i - 1][temp_w][temp_v]) {
+			temp_w -= w1[i - 1];
+			temp_v -= v1[i - 1];
+			result[count] = i;
+			count++;
+		}
+	}
+
+	std::cout << M[N][W][V] << std::endl;
+	std::cout << count << std::endl;
+	std::cout << "(";
+	for (int i = count - 1; i > -1; i--) {
+		if (i == (count - 1)) {
+			std::cout << result[i];
+		}
+		else {
+			std::cout << "," << result[i];
+		}
+	}
+	std::cout << ")";
+
+
+	for (int i = 0; i < N + 1; i++) {
+		for (int j = 0; j < W + 1; j++) {
+			delete[] M[i][j];
+		}
+		delete[] M[i];
+	}
+
+	delete[] M;
+	delete[] result;
+	delete[] c1;
+	delete[] w1;
+	delete[] v1;
+
+}
