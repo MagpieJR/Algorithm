@@ -1,0 +1,141 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+const int Max = 1000;
+
+void Merge(std::vector<int>& Array, std::vector<int>& Array01, std::vector<int>& Array02, int front, int mid, int end) {
+
+    std::vector<int> LeftSub(Array.begin() + front, Array.begin() + mid + 1),
+                     RightSub(Array.begin() + mid + 1, Array.begin() + end + 1);
+
+    std::vector<int> LeftSub01(Array01.begin() + front, Array01.begin() + mid + 1),
+                     RightSub01(Array01.begin() + mid + 1, Array01.begin() + end + 1);
+
+    std::vector<int> LeftSub02(Array02.begin() + front, Array02.begin() + mid + 1),
+                     RightSub02(Array02.begin() + mid + 1, Array02.begin() + end + 1);
+
+    LeftSub.insert(LeftSub.end(), Max);      
+    RightSub.insert(RightSub.end(), Max);    
+
+    LeftSub01.insert(LeftSub01.end(), Max);
+    RightSub01.insert(RightSub01.end(), Max);
+
+    LeftSub02.insert(LeftSub02.end(), Max);
+    RightSub02.insert(RightSub02.end(), Max);
+
+    int idxLeft = 0, idxRight = 0;
+
+    for (int i = front; i <= end; i++) {
+
+        if (LeftSub[idxLeft] <= RightSub[idxRight]) {
+            Array[i] = LeftSub[idxLeft];
+            Array01[i] = LeftSub01[idxLeft];
+            Array02[i] = LeftSub02[idxLeft];
+            idxLeft++;
+        }
+        else {
+            Array[i] = RightSub[idxRight];
+            Array01[i] = RightSub01[idxRight];
+            Array02[i] = RightSub02[idxRight];
+            idxRight++;
+        }
+
+    }
+}
+
+void MergeSort(std::vector<int>& array, std::vector<int>& array01, std::vector<int>& array02, int front, int end) {
+    if (front < end) {                   
+        int mid = (front + end) / 2;         
+        MergeSort(array, array01, array02, front, mid);    
+        MergeSort(array, array01, array02, mid + 1, end);
+        Merge(array, array01, array02, front, mid, end);
+    }
+}
+
+void PrintArray(std::vector<int>& array) {
+    for (int i = 0; i < array.size(); i++) {
+        std::cout << array[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+void Selection(std::vector<int>& start, std::vector<int>& last, std::vector<int> & result, std::vector<int> & index) {
+
+    result.push_back(*(index.end() - 1));
+
+    int value = *(start.end() - 1);
+
+    index.pop_back();
+    last.pop_back();
+    start.pop_back();
+
+    for (int i = start.size() - 1; i > -1; i--) {
+
+        if ((value < last[i])){
+            
+            start.erase(start.begin() + i);
+            last.erase(last.begin() + i);
+            index.erase(index.begin() + i);
+
+        }
+
+    }
+
+    if (last.size() > 0) {
+        Selection(start, last, result, index);
+    }
+
+
+
+}
+
+
+int main() {
+
+    int n, * s, * f;
+    std::cin >> n;
+
+    s = new int[n];
+    f = new int[n];
+
+    for (int i = 0; i < n; i++) {
+        std::cin >> s[i];
+    }
+
+    for (int i = 0; i < n; i++) {
+        std::cin >> f[i];
+    }
+
+    std::vector<int> Start(s, s + n);
+    std::vector<int> Last(f, f + n);
+    std::vector<int> Result;
+    std::vector<int> Index;
+
+    for (int i = 1; i < n + 1; i++) {
+        Index.push_back(i);
+    }
+
+    MergeSort(Start, Last, Index, 0, n - 1);
+
+
+    int count = 0;
+  
+    Selection(Start, Last, Result, Index);
+    
+    std::cout << Result.size() << std::endl;
+    std::cout << "(";
+    for (int i = Result.size() - 1; i > -1 ; i--){
+        if (i == Result.size() - 1) {
+            std::cout << Result[i];
+        }
+        else {
+            std::cout << "," << Result[i];
+        }
+    }
+    std::cout << ")";
+
+
+    delete[] s;
+    delete[] f;
+}
