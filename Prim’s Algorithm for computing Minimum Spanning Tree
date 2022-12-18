@@ -1,0 +1,118 @@
+#include <iostream>
+
+int FindMinIndex(int* vertices, int NumVertices) {
+	int min = vertices[0], index = 0;
+	for (int i = 0; i < NumVertices; i++) {
+		if (vertices[i] < min) {
+			min = vertices[i];
+			index = i;
+		}
+	}
+	return index;
+}
+
+
+int FindMinValue(int* vertices, int NumVertices) {
+	int min = vertices[0];
+	for (int i = 0; i < NumVertices; i++) {
+		if (vertices[i] < min) {
+			min = vertices[i];
+		}
+	}
+	return min;
+}
+
+void Update(int* vertices, int* parents, int** weight, int NumWeight, int index, int& NumUpdate, int* UpdatedIndex) {
+
+	for (int i = 0; i < NumWeight; i++) {
+		if (weight[0][i] == (index + 1) && vertices[weight[1][i] - 1] != 10002) {
+			if (vertices[weight[1][i] - 1] > weight[2][i] && vertices[weight[1][i] - 1] != 10002) {
+				vertices[weight[1][i] - 1] = weight[2][i];
+				UpdatedIndex[NumUpdate] = (weight[1][i] - 1);
+				parents[weight[1][i] - 1] = index;
+				NumUpdate++;
+			}
+			else {
+				UpdatedIndex[NumUpdate] = (weight[1][i] - 1);
+				NumUpdate++;
+			}
+		}
+		else if (weight[1][i] == (index + 1) && vertices[weight[0][i] - 1] != 10002) {
+			if (vertices[weight[0][i] - 1] > weight[2][i] && vertices[weight[0][i] - 1] != 10002) {
+				vertices[weight[0][i] - 1] = weight[2][i];
+				UpdatedIndex[NumUpdate] = (weight[0][i] - 1);
+				parents[weight[0][i] - 1] = index;
+				NumUpdate++;
+			}
+			else {
+				UpdatedIndex[NumUpdate] = (weight[0][i] - 1);
+				NumUpdate++;
+			}
+		}
+	}
+	vertices[index] = 10002;
+}
+
+void PrimAlgorithm(int Index, int* vertices, int NumVertices, int* parents, int** weight, int NumWeight, int& sum) {
+
+	int NumUpdate = 0, UpdatedIndex[50];
+	Update(vertices, parents, weight, NumWeight, Index, NumUpdate, UpdatedIndex);
+	if (FindMinValue(vertices, NumVertices) != 10002) {
+		int index = FindMinIndex(vertices, NumVertices);
+		sum += vertices[index];
+		PrimAlgorithm(index, vertices, NumVertices, parents, weight, NumWeight, sum);
+	}
+}
+
+int main() {
+	int n, m, ** weight, * vertices, * parents, s, sum = 0;
+	std::cin >> n >> m;
+
+	weight = new int* [3];
+
+	for (int i = 0; i < 3; i++) {
+		weight[i] = new int[m];
+	}
+
+	for (int j = 0; j < m; j++) {
+		for (int i = 0; i < 3; i++) {
+			std::cin >> weight[i][j];
+		}
+	}
+
+	std::cin >> s;
+
+	vertices = new int[n];
+	parents = new int[n];
+
+	for (int i = 0; i < n; i++) {
+		vertices[i] = 10001;
+	}
+
+	vertices[s - 1] = 0;
+	parents[s - 1] = 0;
+	int size = 0;
+	PrimAlgorithm(s - 1, vertices, n, parents, weight, m, sum);
+	parents[s - 1] = -1;
+
+	for (int i = 0; i < n; i++) {
+		if (i == 0) {
+			std::cout << parents[i] + 1;
+		}
+		else {
+			std::cout << " " << parents[i] + 1;
+		}
+
+	}
+
+	std::cout << std::endl << sum;
+
+
+	for (int i = 0; i < 3; i++) {
+		delete[] weight[i];
+	}
+	delete[]weight;
+	delete[] vertices;
+	delete[]parents;
+
+}
