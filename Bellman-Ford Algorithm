@@ -1,0 +1,76 @@
+#include <iostream>
+
+
+
+int main() {
+	int n, m, s, ** weight, * parents, flag = 1;
+	double* vertices;
+	std::cin >> n >> m;
+
+	weight = new int* [3];
+	for (int i = 0; i < 3; i++) {
+		weight[i] = new int[m];
+	}
+	for (int j = 0; j < m; j++) {
+		for (int i = 0; i < 3; i++) {
+			std::cin >> weight[i][j];
+		}
+	}
+	std::cin >> s;
+
+	vertices = new double[n];
+	parents = new int[n];
+	
+
+	for (int i = 0; i < n; i++) {
+		vertices[i] = 10001;
+	}
+
+	vertices[s - 1] = 0;
+
+	for (int i = 1; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			if (vertices[weight[1][j] - 1] > vertices[weight[0][j] - 1] + weight[2][j]) {
+				vertices[weight[1][j] - 1] = vertices[weight[0][j] - 1] + weight[2][j];
+				parents[weight[1][j] - 1] = weight[0][j] - 1;
+			}
+		}
+	}
+
+	for (int j = 0; j < m; j++) {
+		if (vertices[weight[1][j] - 1] > vertices[weight[0][j] - 1] + weight[2][j]) {
+			flag = 0;
+		}
+	}
+
+	if (flag) {
+		for (int i = 0; i < n; i++) {
+			if (i == 0) {
+				std::cout << vertices[i];
+			}
+			else {
+				std::cout << " " << vertices[i];
+			}
+		}
+		std::cout << std::endl;
+		parents[s - 1] = -1;
+		for (int i = 0; i < n; i++) {
+			if (i == 0) {
+				std::cout << parents[i] + 1;
+			}
+			else {
+				std::cout << " " << parents[i] + 1;
+			}
+		}
+	}
+	else {
+		std::cout << "There is a negative weight cycle in the graph";
+	}
+
+	for (int i = 0; i < 3; i++) {
+		delete[]weight[i];
+	}
+	delete[]weight;
+	delete[]vertices;
+	delete[]parents;
+}
