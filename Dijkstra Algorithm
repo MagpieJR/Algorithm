@@ -1,0 +1,116 @@
+#include <iostream>
+
+int FindMinValue(int* vertices, int NumVertices) {
+	int min = vertices[0];
+	for (int i = 0; i < NumVertices; i++) {
+		if (vertices[i] < min) {
+			min = vertices[i];
+		}
+	}
+	return min;
+}
+
+int FindMinIndex(int *vertices, int NumVertices) {
+	int min = vertices[0], index = 0;
+	for (int i = 0; i < NumVertices; i++) {
+		if (vertices[i] < min) {
+			min = vertices[i];
+			index = i;
+		}
+	}
+	return index;
+}
+
+void Update(int index, int* vertices, int NumVertices, int** weight, int NumWeight, int* parents, double *shortest) {
+	for (int i = 0; i < NumWeight; i++) {
+
+		if (index == (weight[0][i] - 1)) {
+			if (vertices[weight[1][i] - 1] > vertices[index] + weight[2][i] && vertices[weight[1][i] - 1] != 10002) {
+
+				vertices[weight[1][i] - 1] = vertices[index] + weight[2][i];
+				parents[weight[1][i] - 1] = index;
+
+			}
+
+		}
+
+	}
+
+	shortest[index] = vertices[index];
+	vertices[index] = 10002;
+}
+
+void Dijkstra(int *vertices, int NumVertices, int **weight, int NumWeight, int*parents, double *shortest, int &size) {
+	if (FindMinValue(vertices, NumVertices) != 10002 && size < 2) {
+		int index = FindMinIndex(vertices, NumVertices);
+		Update(index, vertices, NumVertices, weight, NumWeight, parents, shortest);
+		
+		Dijkstra(vertices, NumVertices, weight, NumWeight, parents, shortest, size);
+		
+	}
+}
+
+int main() {
+	int n, m, s, ** weight, *vertices, *parents;
+	double *shortest;
+	std::cin >> n >> m;
+
+	weight = new int* [3];
+	for (int i = 0; i < 3; i++) {
+		weight[i] = new int[m];
+	}
+
+	for (int j = 0; j < m; j++) {
+		for (int i = 0; i < 3; i++) {
+			std::cin >> weight[i][j];
+		}
+	}
+
+	std::cin >> s;
+
+	vertices = new int[n];
+	parents = new int[n];
+	shortest = new double[n];
+
+	for (int i = 0; i < n; i++) {
+		vertices[i] = 10001;
+	}
+
+	vertices[s - 1] = 0;
+	parents[s - 1] = 0;
+	int size = 0;
+	Dijkstra(vertices, n, weight, m, parents, shortest, size);
+
+	
+	for (int i = 0; i < n; i++) {
+		if (i == 0) {
+			std::cout << shortest[i];
+		}
+		else {
+			std::cout << " " << shortest[i];
+		}
+	}
+
+	std::cout << std::endl;
+
+	parents[s - 1] = -1;
+
+	for (int i = 0; i < n; i++) {
+		if (i == 0) {
+			std::cout << parents[i] + 1;
+		}
+		else {
+			std::cout << " " << parents[i] + 1;
+		}
+	}
+	
+
+
+	for (int i = 0; i < 3; i++) {
+		delete[]weight[i];
+	}
+	delete[]weight;
+	delete[]vertices;
+	delete[]shortest;
+	delete[]parents;
+}
