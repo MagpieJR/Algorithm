@@ -1,0 +1,75 @@
+#include <iostream>
+
+int main() {
+	int n, m, **shortest;
+	std::cin >> n >> m;
+
+	shortest = new int* [n];
+	for (int i = 0; i < n; i++) {
+		shortest[i] = new int[n];
+	}
+	
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			shortest[i][j] = 10001;
+		}
+	}
+
+	for (int i = 0; i < m; i++) {
+		int x, y, z;
+		std::cin >> x >> y >> z;
+
+		shortest[x - 1][y - 1] = z;
+	}
+
+
+	for (int k = 0; k < n; k++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				
+				if (shortest[i][j] > shortest[i][k] + shortest[k][j] && i != j) {
+					shortest[i][j] = shortest[i][k] + shortest[k][j];
+				}
+				else {
+					shortest[i][j] = shortest[i][j];
+				}
+				
+			}
+		}
+	}
+
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (j == 0) {
+				if (i == j) {
+					std::cout << "0";
+				}else if (shortest[i][j] == 10001) {
+					std::cout << "N";
+				}
+				else {
+					std::cout << shortest[i][j];
+				}
+			}
+			else {
+
+				if (i == j) {
+					std::cout << " 0";
+				}else if (shortest[i][j] == 10001) {
+					std::cout << " N";
+				}
+				else {
+					std::cout << " " << shortest[i][j];
+				}
+			}
+		}
+		if (i != (n - 1)) {
+			std::cout << std::endl;
+		}
+	}
+
+	for (int i = 0; i < n; i++) {
+		delete[] shortest[i];
+	}
+	delete[] shortest;
+}
