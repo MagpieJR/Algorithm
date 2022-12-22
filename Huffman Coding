@@ -1,0 +1,116 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <string>
+
+class HuffNode {
+
+public:
+	HuffNode(int Freq, int Character) {
+		freq = Freq;
+		character = Character;
+	}
+	int freq;
+	int character;
+	HuffNode* Left = nullptr, * Right = nullptr;
+
+};
+
+class HuffTree {
+public:
+	HuffTree(HuffTree h1, HuffTree h2) {
+		root->Left = h1.root;
+		root->Right = h2.root;
+		root->freq = h1.root->freq + h2.root->freq;
+	}
+
+	HuffNode* root;
+};
+
+
+bool compare(HuffNode* a, HuffNode* b) {
+	if ( a->freq == b->freq) {
+		return a->character < b->character;
+	}
+	else {
+		return a->freq > b->freq;
+	}
+}
+
+
+void Huffman(std::vector<HuffNode*> &Node, int& size, int time) {
+	std::sort(Node.begin(), Node.end(), compare);
+	HuffNode *Left = Node.back();
+	Node.pop_back();
+	HuffNode *Right = Node.back();
+	Node.pop_back();
+	HuffNode *root = new HuffNode(Left->freq + Right->freq, -1);
+	root->Left = Left;
+	root->Right = Right;
+	Node.push_back(root);
+	size++;
+	if (size < time - 1) Huffman(Node,size, time);
+}
+
+
+std::string CombindString(std::vector<std::string>& huff) {
+	std::string TmpString;
+	for (int i = 0; i < huff.size(); i++) {
+		TmpString += huff[i];
+	}
+	return TmpString;
+}
+
+void PrintCode(HuffNode* Node, std::string *text, std::vector<std::string> &content) {
+	if (Node->character != -1) {
+		for (int i = 0; i < content.size(); i++) {
+			text[Node->character - 1] += content[i];
+		}
+	}
+	if (Node->Left != nullptr) {
+		content.push_back("0");
+		PrintCode(Node->Left, text, content);
+	}
+
+	if (Node->Right != nullptr) {
+		content.push_back("1");
+		PrintCode(Node->Right, text, content);
+	}
+
+	delete Node;
+
+	if (content.size() != 0) {
+		content.pop_back();
+	}
+}
+
+int main() {
+
+	int n;
+	std::vector<HuffNode*> Node;
+	std::vector<HuffTree*> Tree;
+	std::vector<std::string> Content;
+	std::string *text;
+	std::cin >> n;
+
+	text = new std::string[n];
+
+	for (int i = 0; i < n; i++) {
+		int tmp;
+		std::cin >> tmp;
+		HuffNode *node;
+		node = new HuffNode(tmp, i + 1);
+		Node.push_back(node);
+	}
+
+	int size = 0;
+	Huffman(Node, size, n);
+	size = 0;
+	PrintCode(Node[0], text, Content);
+
+	for (int i = 0; i < n; i++) {
+		std::cout << text[i] << " ";
+	}
+	delete[]text;
+}
+
