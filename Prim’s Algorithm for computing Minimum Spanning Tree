@@ -1,0 +1,109 @@
+#include <iostream>
+#include <vector>
+
+int FinMinIndex(int* vertices, int NumVertices) {
+	int min = vertices[NumVertices - 1], index = NumVertices - 1;
+	for (int i = NumVertices - 1; i > -1; i--) {
+		if (vertices[i] == min && i < index) {
+			index = i;
+		}
+		else if (vertices[i] < min) {
+			min = vertices[i];
+			index = i;
+		}
+	}
+	return index;
+}
+
+int FindMinValue(int* vertices, int NumVertices) {
+	int min = vertices[0], index = 0;
+	for (int i = 1; i < NumVertices; i++) {
+		if (vertices[i] == min && i < index) {
+			min = vertices[i];
+			index = i;
+		}
+		else if(vertices[i] < min) {
+			min = vertices[i];
+			index = i;
+		}
+	}
+	return min;
+}
+
+void Update(int index, int* vertices, int** weight, int NumWeight, int* parents, int &sum) {
+	for (int i = 0; i < NumWeight; i++) {
+		if (index == weight[0][i] - 1 && vertices[weight[1][i] - 1] != 10002) {
+			if ((vertices[weight[1][i] - 1])  >  weight[2][i]) {
+				vertices[weight[1][i] - 1] = weight[2][i];
+				parents[weight[1][i] - 1] = index;
+			}
+		}
+		else if (index == weight[1][i] - 1 && vertices[weight[0][i] - 1] != 10002) {
+			if ((vertices[weight[0][i] - 1]) > weight[2][i]) {
+				vertices[weight[0][i] - 1] = weight[2][i];
+				parents[weight[0][i] - 1] = index;
+			}
+		}
+	}
+
+	sum += vertices[index];
+	vertices[index] = 10002;
+}
+
+void Prim(int* vertices, int* parents, int NumVertices, int** weight, int NumWeight, int& sum) {
+	if (FindMinValue(vertices, NumVertices) != 10002) {
+		int index = FinMinIndex(vertices, NumVertices);
+		Update(index, vertices, weight, NumWeight, parents, sum);
+		Prim(vertices, parents, NumVertices, weight, NumWeight, sum);
+	}
+}
+
+
+int main() {
+	int n, m, s, **weight, *vertices, *parents, sum = 0;
+	std::cin >> n >> m;
+
+	weight = new int* [3];
+	for (int i = 0; i < 3; i++) {
+		weight[i] = new int[m];
+	}
+
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < 3; j++) {
+			std::cin >> weight[j][i];
+		}
+	}
+
+	std::cin >> s;
+
+	vertices = new int[n];
+	parents = new int[n];
+
+	for (int i = 0; i < n; i++) {
+		vertices[i] = 10001;
+	}
+
+	vertices[s - 1] = 0;
+	parents[s - 1] = 0;
+
+	Prim(vertices, parents, n, weight, m, sum);
+
+
+	parents[s - 1] = -1;
+	for (int i = 0; i < n; i++) {
+		if (i == 0) {
+			std::cout << parents[i] + 1;
+		}
+		else {
+			std::cout << " " << parents[i] + 1;
+		}
+	}
+	std::cout << std::endl  << sum;
+
+	for (int i = 0; i < 3; i++) {
+		delete[] weight[i];
+	}
+	delete[] vertices;
+	delete[] parents;
+	delete[] weight;
+}
